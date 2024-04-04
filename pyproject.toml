@@ -1,6 +1,6 @@
 [project]
 name = "llm-command-r"
-version = "0.1"
+version = "0.2"
 description = "Access the Cohere Command R family of models"
 readme = "README.md"
 authors = [{name = "Simon Willison"}]
