@@ -64,7 +64,7 @@ def register_commands(cli):
             print("Sources:")
             print()
             for doc in documents:
-                print(doc["title"], "-", doc["url"])
+                print("-", doc["title"], "-", doc["url"])
 
 
 @llm.hookimpl
