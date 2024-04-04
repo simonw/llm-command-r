@@ -1,0 +1,26 @@
+[project]
+name = "llm-command-r"
+version = "0.1"
+description = "Access the Cohere Command R family of models"
+readme = "README.md"
+authors = [{name = "Simon Willison"}]
+license = {text = "Apache-2.0"}
+classifiers = [
+    "License :: OSI Approved :: Apache Software License"
+]
+dependencies = [
+    "llm",
+    "cohere"
+]
+
+[project.urls]
+Homepage = "https://github.com/simonw/llm-command-r"
+Changelog = "https://github.com/simonw/llm-command-r/releases"
+Issues = "https://github.com/simonw/llm-command-r/issues"
+CI = "https://github.com/simonw/llm-command-r/actions"
+
+[project.entry-points.llm]
+command_r = "llm_command_r"
+
+[project.optional-dependencies]
+test = ["pytest"]
