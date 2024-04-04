@@ -1,7 +1,58 @@
-import llm
-from pydantic import Field, field_validator, model_validator
-from typing import Optional, List
+import click
 import cohere
+import llm
+from pydantic import Field
+import sys
+from typing import Optional, List
+
+
+@llm.hookimpl
+def register_commands(cli):
+    @cli.command()
+    @click.argument("prompt")
+    @click.option("-s", "--system", help="System prompt to use")
+    @click.option("model_id", "-m", "--model", help="Model to use")
+    @click.option(
+        "options",
+        "-o",
+        "--option",
+        type=(str, str),
+        multiple=True,
+        help="key/value options for the model",
+    )
+    @click.option("-n", "--no-log", is_flag=True, help="Don't log to database")
+    @click.option("--key", help="API key to use")
+    def command_r_search(prompt, system, model_id, options, no_log, key):
+        "Prompt Command R with the web search feature"
+        model_id = model_id or "command-r"
+        model = llm.get_model(model_id)
+        if model.needs_key:
+            model.key = llm.get_key(key, model.needs_key, model.key_env_var)
+        validated_options = {}
+        options = list(options)
+        options.append(("websearch", "1"))
+        try:
+            validated_options = dict(
+                (key, value)
+                for key, value in model.Options(**dict(options))
+                if value is not None
+            )
+        except pydantic.ValidationError as ex:
+            raise click.ClickException(render_errors(ex.errors()))
+        response = model.prompt(prompt, system=system, **validated_options)
+        for chunk in response:
+            print(chunk, end="")
+            sys.stdout.flush()
+
+        # Now output the citations
+        documents = response.response_json.get("documents", [])
+        if documents:
+            print()
+            print()
+            print("Sources:")
+            print()
+            for doc in documents:
+                print(doc["title"], "-", doc["url"])
 
 
 @llm.hookimpl
