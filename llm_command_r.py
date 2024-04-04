@@ -2,6 +2,7 @@ import click
 import cohere
 import llm
 from pydantic import Field
+import sqlite_utils
 import sys
 from typing import Optional, List
 
@@ -24,6 +25,9 @@ def register_commands(cli):
     @click.option("--key", help="API key to use")
     def command_r_search(prompt, system, model_id, options, no_log, key):
         "Prompt Command R with the web search feature"
+        from llm.cli import logs_on, logs_db_path
+        from llm.migrations import migrate
+
         model_id = model_id or "command-r"
         model = llm.get_model(model_id)
         if model.needs_key:
@@ -43,6 +47,14 @@ def register_commands(cli):
         for chunk in response:
             print(chunk, end="")
             sys.stdout.flush()
+
+        # Log to the database
+        if (logs_on() or log) and not no_log:
+            log_path = logs_db_path()
+            (log_path.parent).mkdir(parents=True, exist_ok=True)
+            db = sqlite_utils.Database(log_path)
+            migrate(db)
+            response.log_to_db(db)
 
         # Now output the citations
         documents = response.response_json.get("documents", [])
@@ -108,12 +120,12 @@ class CohereMessages(llm.Model):
                 if event.event_type == "text-generation":
                     yield event.text
                 elif event.event_type == "stream-end":
-                    response.response_json = dict(event.response)
+                    response.response_json = event.response.dict()
         else:
             event = client.chat(**kwargs)
             answer = event.text
             yield answer
-            response.response_json = dict(event)
+            response.response_json = event.dict()
 
     def __str__(self):
         return "Cohere Messages: {}".format(self.model_id)
