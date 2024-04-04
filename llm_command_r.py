@@ -16,6 +16,12 @@ class CohereMessages(llm.Model):
     key_env_var = "COHERE_API_KEY"
     can_stream = True
 
+    class Options(llm.Options):
+        websearch: Optional[bool] = Field(
+            description="Use web search connector",
+            default=False,
+        )
+
     def __init__(self, model_id):
         self.model_id = model_id
 
@@ -42,6 +48,9 @@ class CohereMessages(llm.Model):
 
         if conversation:
             kwargs["chat_history"] = self.build_chat_history(conversation)
+
+        if prompt.options.websearch:
+            kwargs["connectors"] = [{"id": "web-search"}]
 
         if stream:
             for event in client.chat_stream(**kwargs):
