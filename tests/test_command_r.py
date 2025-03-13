@@ -1,6 +1,6 @@
-from llm.plugins import pm
+import llm
 
 
 def test_plugin_is_installed():
-    names = [mod.__name__ for mod in pm.get_plugins()]
-    assert "llm_command_r" in names
+    model_ids = [m.model_id for m in llm.get_models()]
+    assert "command-r" in model_ids
