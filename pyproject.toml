@@ -9,8 +9,8 @@ classifiers = [
     "License :: OSI Approved :: Apache Software License"
 ]
 dependencies = [
-    "llm",
-    "cohere"
+    "llm>=0.23",
+    "cohere>=5.14.0"
 ]
 
 [project.urls]

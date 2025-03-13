@@ -79,6 +79,7 @@ class CohereMessages(llm.Model):
     needs_key = "cohere"
     key_env_var = "COHERE_API_KEY"
     can_stream = True
+    supports_schema = True
 
     class Options(llm.Options):
         websearch: Optional[bool] = Field(
@@ -102,7 +103,7 @@ class CohereMessages(llm.Model):
         return chat_history
 
     def execute(self, prompt, stream, response, conversation):
-        client = cohere.Client(self.get_key())
+        client = cohere.Client(self.get_key(), log_warning_experimental_features=False)
         kwargs = {
             "message": prompt.prompt,
             "model": self.model_id,
@@ -115,6 +116,9 @@ class CohereMessages(llm.Model):
 
         if prompt.options.websearch:
             kwargs["connectors"] = [{"id": "web-search"}]
+
+        if prompt.schema:
+            kwargs["response_format"] = {"type": "json_object", "schema": prompt.schema}
 
         if stream:
             for event in client.chat_stream(**kwargs):
