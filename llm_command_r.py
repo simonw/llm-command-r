@@ -73,6 +73,7 @@ def register_models(register):
     register(CohereMessages("command-r"), aliases=("r",))
     register(CohereMessages("command-r-plus"), aliases=("r-plus",))
     register(CohereMessages("command-r7b-12-2024"), aliases=("command-r7b",))
+    register(CohereMessages("command-a-03-2025"), aliases=("command-a",))
 
 
 class CohereMessages(llm.Model):
