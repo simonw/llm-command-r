@@ -1,7 +1,7 @@
 import click
 import cohere
 import llm
-from pydantic import Field
+from pydantic import Field, ValidationError
 import sqlite_utils
 import sys
 from typing import Optional, List
@@ -41,15 +41,15 @@ def register_commands(cli):
                 for key, value in model.Options(**dict(options))
                 if value is not None
             )
-        except pydantic.ValidationError as ex:
-            raise click.ClickException(render_errors(ex.errors()))
+        except ValidationError as ex:
+            raise click.ClickException(ex.errors())
         response = model.prompt(prompt, system=system, **validated_options)
         for chunk in response:
             print(chunk, end="")
             sys.stdout.flush()
 
         # Log to the database
-        if (logs_on() or log) and not no_log:
+        if logs_on() and not no_log:
             log_path = logs_db_path()
             (log_path.parent).mkdir(parents=True, exist_ok=True)
             db = sqlite_utils.Database(log_path)
