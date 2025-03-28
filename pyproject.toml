@@ -23,4 +23,4 @@ CI = "https://github.com/simonw/llm-command-r/actions"
 command_r = "llm_command_r"
 
 [project.optional-dependencies]
-test = ["pytest"]
+test = ["pytest", "pytest-recording"]
