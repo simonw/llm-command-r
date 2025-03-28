@@ -49,3 +49,7 @@ To run the tests:
 ```bash
 pytest
 ```
+To generate new recorded VCR cassettes:
+```bash
+PYTEST_COHERE_API_KEY="$(llm keys get cohere)" pytest --record-mode once
+```
