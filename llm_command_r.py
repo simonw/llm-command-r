@@ -1,6 +1,7 @@
 import click
 import cohere
 import llm
+import os
 from pydantic import Field, ValidationError
 import sqlite_utils
 import sys
@@ -104,7 +105,10 @@ class CohereMessages(llm.Model):
         return chat_history
 
     def execute(self, prompt, stream, response, conversation):
-        client = cohere.Client(self.get_key(), log_warning_experimental_features=False)
+        kwargs = {"log_warning_experimental_features": False}
+        if os.environ.get("COHERE_BASE_URL"):
+            kwargs["base_url"] = os.environ["COHERE_BASE_URL"]
+        client = cohere.Client(self.get_key(), **kwargs)
         kwargs = {
             "message": prompt.prompt,
             "model": self.model_id,

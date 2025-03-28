@@ -22,6 +22,7 @@ You will need a [Cohere API key](https://dashboard.cohere.com/api-keys). Configu
 llm keys set cohere
 # Paste key here
 ```
+To use an alternative base URL for the Cohere API, set the `COHERE_BASE_URL` environment variable.
 
 ## Usage
 
